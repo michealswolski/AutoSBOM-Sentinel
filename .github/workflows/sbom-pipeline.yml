@@ -44,17 +44,21 @@ jobs:
           output-file: sbom.cdx.json
           upload-artifact: false
 
+      - name: Install Grype
+        uses: anchore/scan-action/download-grype@v4
+        id: grype-install
+
+      # Run grype directly so the JSON report lands in a file we control —
+      # the wrapper action's json output produced an empty file on this repo.
       - name: Scan (Grype)
-        uses: anchore/scan-action@v4
-        id: grype
-        with:
-          sbom: sbom.cdx.json
-          output-format: json
-          fail-build: false
+        run: |
+          "${{ steps.grype-install.outputs.cmd }}" sbom:sbom.cdx.json \
+            -o json --file grype-findings.json
+          python3 -c "import json; json.load(open('grype-findings.json'))" \
+            || { echo "grype produced invalid JSON" >&2; exit 1; }
 
       - name: Apply approved VEX filter
         run: |
-          cp "${{ steps.grype.outputs.json }}" grype-findings.json
           # Only APPROVED statements in the checked-in review store suppress
           # anything; the store is reviewed like code (see autosbom vex).
           python - <<'EOF'
