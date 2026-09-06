@@ -96,7 +96,13 @@ jobs:
             --output-certificate sbom.cdx.json.pem \
             sbom.cdx.json
 
+      # GitHub artifact attestations are not available on user-owned PRIVATE
+      # repositories (the API refuses with "make this repository public") —
+      # guard on visibility so the step activates automatically once the
+      # portfolio repo is made public. cosign keyless signing above works
+      # either way and already ran successfully.
       - name: Attest build provenance
+        if: ${{ github.event.repository.visibility == 'public' }}
         uses: actions/attest-build-provenance@v1
         with:
           subject-path: sbom.cdx.json
