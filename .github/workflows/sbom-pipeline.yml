@@ -1,0 +1,113 @@
+# "Continuous compliance" pipeline (Tier 3):
+#   generate (Syft) -> scan (Grype) -> VEX filter (approved statements only)
+#   -> sign (cosign keyless) -> provenance attestation -> report artifact
+#   -> optional Dependency-Track upload (only when secrets are configured).
+#
+# Framing (see README): this demonstrates the vulnerability-monitoring loop
+# UNECE R155 CSMS expects and prepares machine-readable evidence relevant to
+# EU CRA Article 14 reporting. ENISA's reporting platform is a web-portal
+# submission process at launch — this pipeline prepares evidence for human
+# submission; it does not (and cannot) file reports automatically.
+
+name: SBOM pipeline
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write        # cosign keyless signing (OIDC -> Fulcio)
+  attestations: write    # GitHub artifact attestation (in-toto/SLSA-style)
+
+jobs:
+  sbom:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate SBOM (Syft)
+        uses: anchore/sbom-action@v0
+        with:
+          path: .
+          format: cyclonedx-json
+          output-file: sbom.cdx.json
+          upload-artifact: false
+
+      - name: Scan (Grype)
+        uses: anchore/scan-action@v4
+        id: grype
+        with:
+          sbom: sbom.cdx.json
+          output-format: json
+          fail-build: false
+
+      - name: Apply approved VEX filter
+        run: |
+          pip install -e .
+          cp "${{ steps.grype.outputs.json }}" grype-findings.json
+          # Only APPROVED statements in the checked-in review store suppress
+          # anything; the store is reviewed like code (see autosbom vex).
+          python - <<'EOF'
+          import json, pathlib
+          from autosbom.stage2_vex.review import ReviewStore
+          suppressed = set()
+          store_path = pathlib.Path("vex/review-store.json")
+          if store_path.exists():
+              suppressed = ReviewStore.load(store_path).suppressed_cves()
+          findings = json.loads(pathlib.Path("grype-findings.json").read_text())
+          matches = findings.get("matches", [])
+          kept = [m for m in matches
+                  if m.get("vulnerability", {}).get("id") not in suppressed]
+          print(f"{len(matches)} findings, {len(matches)-len(kept)} suppressed "
+                f"by approved VEX, {len(kept)} actionable")
+          pathlib.Path("actionable-findings.json").write_text(
+              json.dumps({"matches": kept}, indent=2))
+          EOF
+
+      - name: Render HTML report
+        run: |
+          autosbom report --sbom sbom.cdx.json \
+            --findings grype-findings.json \
+            $( [ -f vex/review-store.json ] && echo --review-store vex/review-store.json ) \
+            --target-name "${{ github.repository }}@${{ github.sha }}" \
+            --output build-report.html
+
+      - name: Sign SBOM (cosign keyless)
+        uses: sigstore/cosign-installer@v3
+      - run: |
+          COSIGN_YES=true cosign sign-blob \
+            --output-signature sbom.cdx.json.sig \
+            --output-certificate sbom.cdx.json.pem \
+            sbom.cdx.json
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: sbom.cdx.json
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-and-report
+          path: |
+            sbom.cdx.json
+            sbom.cdx.json.sig
+            sbom.cdx.json.pem
+            grype-findings.json
+            actionable-findings.json
+            build-report.html
+
+      - name: Upload to Dependency-Track (optional)
+        if: ${{ vars.DTRACK_URL != '' }}
+        env:
+          DTRACK_URL: ${{ vars.DTRACK_URL }}
+          DTRACK_API_KEY: ${{ secrets.DTRACK_API_KEY }}
+        run: |
+          curl -sf -X POST "$DTRACK_URL/api/v1/bom" \
+            -H "X-Api-Key: $DTRACK_API_KEY" \
+            -F "autoCreate=true" \
+            -F "projectName=${{ github.repository }}" \
+            -F "projectVersion=${{ github.ref_name }}" \
+            -F "bom=@sbom.cdx.json"

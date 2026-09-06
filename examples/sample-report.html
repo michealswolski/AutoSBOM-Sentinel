@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AutoSBOM Sentinel — Build Report</title><style>
+:root {
+  color-scheme: light;
+  --surface-1: #fcfcfb; --page: #f9f9f7;
+  --ink-1: #0b0b0b; --ink-2: #52514e; --ink-muted: #898781;
+  --grid: #e1e0d9; --baseline: #c3c2b7;
+  --series-1: #2a78d6; --series-2: #eb6834;
+  --status-critical: #d03b3b; --status-warning: #fab219; --status-good: #0ca30c;
+  --cell-zero: #f0efec; --border: rgba(11,11,11,0.10);
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --surface-1: #1a1a19; --page: #0d0d0d;
+    --ink-1: #ffffff; --ink-2: #c3c2b7; --ink-muted: #898781;
+    --grid: #2c2c2a; --baseline: #383835;
+    --series-1: #3987e5; --series-2: #d95926;
+    --cell-zero: #232322; --border: rgba(255,255,255,0.10);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --surface-1: #1a1a19; --page: #0d0d0d;
+  --ink-1: #ffffff; --ink-2: #c3c2b7; --ink-muted: #898781;
+  --grid: #2c2c2a; --baseline: #383835;
+  --series-1: #3987e5; --series-2: #d95926;
+  --cell-zero: #232322; --border: rgba(255,255,255,0.10);
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; padding: 24px; background: var(--page); color: var(--ink-1);
+  font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+main { max-width: 960px; margin: 0 auto; }
+h1 { font-size: 22px; margin: 0 0 4px; }
+h2 { font-size: 16px; margin: 32px 0 8px; }
+.sub { color: var(--ink-2); margin: 0 0 20px; }
+.card {
+  background: var(--surface-1); border: 1px solid var(--border);
+  border-radius: 8px; padding: 20px; margin: 12px 0;
+}
+.legend { display: flex; gap: 16px; margin: 8px 0 12px; color: var(--ink-2); font-size: 13px; }
+.legend .chip { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; }
+.bar-row { display: grid; grid-template-columns: 140px 1fr; align-items: center; gap: 10px; margin: 6px 0; }
+.bar-label { color: var(--ink-2); font-size: 13px; text-align: right; }
+.bar-track { position: relative; height: 34px; }
+.bar {
+  position: absolute; left: 0; height: 14px; border-radius: 0 4px 4px 0;
+  min-width: 2px;
+}
+.bar.raw { top: 2px; background: var(--series-1); }
+.bar.post { top: 18px; background: var(--series-2); }
+.bar-val {
+  position: absolute; font-size: 11px; color: var(--ink-2);
+  transform: translateY(-1px); padding-left: 6px; white-space: nowrap;
+}
+.heat-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.heat-cell {
+  border-radius: 4px; padding: 10px 8px; min-height: 92px;
+  display: flex; flex-direction: column; justify-content: space-between;
+  background: var(--cell-zero); border: 1px solid var(--border);
+}
+.heat-cat { font-size: 11px; color: var(--ink-2); word-break: break-word; }
+.heat-num { font-size: 20px; font-weight: 600; }
+.heat-meta { font-size: 10px; color: var(--ink-muted); }
+.heat-cell.hot .heat-cat, .heat-cell.hot .heat-num, .heat-cell.hot .heat-meta { color: #ffffff; }
+.evt { display: grid; grid-template-columns: 170px 110px 1fr; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--grid); font-size: 13px; }
+.evt:last-child { border-bottom: 0; }
+.evt time { color: var(--ink-muted); font-variant-numeric: tabular-nums; }
+.badge { font-weight: 600; }
+.badge.critical { color: var(--status-critical); }
+.badge.warning { color: var(--status-warning); }
+.badge.ok { color: var(--status-good); }
+details { margin-top: 12px; }
+summary { cursor: pointer; color: var(--ink-2); font-size: 13px; }
+table { border-collapse: collapse; margin-top: 8px; width: 100%; font-size: 13px; }
+th, td { text-align: left; padding: 4px 10px 4px 0; border-bottom: 1px solid var(--grid); }
+th { color: var(--ink-2); font-weight: 600; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.verified { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
+.footnote { color: var(--ink-muted); font-size: 12px; margin-top: 24px; }
+[hidden] { display: none !important; }
+</style></head><body><main>
+<h1>AutoSBOM Sentinel — Build Report</h1>
+<p class="sub">Target: <strong>pi5-ivi-demo (synthetic sample)</strong> ·
+6 components (0 flagged for manual review) ·
+3 unique CVEs reported · 1 suppressed by <em>approved</em> VEX ·
+generated 2026-09-06 08:51 UTC</p>
+<span class="verified"><span class="badge critical">✖</span> drift baseline UNVERIFIED — development mode</span>
+
+<div class="card">
+<h2 style="margin-top:0">Attack-surface heatmap</h2>
+<p class="sub">Actionable CVEs (post-approved-VEX) grouped by exposure
+category — the automotive view, not the package-name view.</p>
+<div class="heat-grid"><div class="heat-cell" style="" title="bluetooth: 1 components, 0 actionable CVEs (max CVSS 0.0)"><div class="heat-cat">bluetooth</div><div class="heat-num">0</div><div class="heat-meta">1 comp · max CVSS 0.0</div></div><div class="heat-cell hot" style="background:#0d366b" title="network-facing: 1 components, 1 actionable CVEs (max CVSS 7.5)"><div class="heat-cat">network-facing</div><div class="heat-num">1</div><div class="heat-meta">1 comp · max CVSS 7.5</div></div><div class="heat-cell" style="" title="can-bus: 1 components, 0 actionable CVEs (max CVSS 0.0)"><div class="heat-cat">can-bus</div><div class="heat-num">0</div><div class="heat-meta">1 comp · max CVSS 0.0</div></div><div class="heat-cell" style="" title="ota-update: 1 components, 0 actionable CVEs (max CVSS 0.0)"><div class="heat-cat">ota-update</div><div class="heat-num">0</div><div class="heat-meta">1 comp · max CVSS 0.0</div></div><div class="heat-cell" style="" title="diagnostics: 0 components, 0 actionable CVEs (max CVSS 0.0)"><div class="heat-cat">diagnostics</div><div class="heat-num">0</div><div class="heat-meta">0 comp · max CVSS 0.0</div></div><div class="heat-cell" style="" title="crypto: 0 components, 0 actionable CVEs (max CVSS 0.0)"><div class="heat-cat">crypto</div><div class="heat-num">0</div><div class="heat-meta">0 comp · max CVSS 0.0</div></div><div class="heat-cell hot" style="background:#0d366b" title="base-system: 2 components, 1 actionable CVEs (max CVSS 0.0)"><div class="heat-cat">base-system</div><div class="heat-num">1</div><div class="heat-meta">2 comp · max CVSS 0.0</div></div></div><details><summary>Data table</summary><table><tr><th>Category</th><th class=num>Components</th><th class=num>Actionable CVEs</th><th class=num>Max CVSS</th></tr><tr><td>bluetooth</td><td class=num>1</td><td class=num>0</td><td class=num>0.0</td></tr><tr><td>network-facing</td><td class=num>1</td><td class=num>1</td><td class=num>7.5</td></tr><tr><td>can-bus</td><td class=num>1</td><td class=num>0</td><td class=num>0.0</td></tr><tr><td>ota-update</td><td class=num>1</td><td class=num>0</td><td class=num>0.0</td></tr><tr><td>diagnostics</td><td class=num>0</td><td class=num>0</td><td class=num>0.0</td></tr><tr><td>crypto</td><td class=num>0</td><td class=num>0</td><td class=num>0.0</td></tr><tr><td>base-system</td><td class=num>2</td><td class=num>1</td><td class=num>0.0</td></tr></table></details>
+</div>
+
+<div class="card">
+<h2 style="margin-top:0">CVE noise reduction — raw vs. post-VEX</h2>
+<p class="sub">Only human-approved VEX statements count as suppression;
+pending proposals still show as raw findings.</p>
+<div class="legend"><span><span class="chip" style="background:var(--series-1)"></span>Raw CVE count</span><span><span class="chip" style="background:var(--series-2)"></span>Actionable after approved VEX</span></div><div class="bar-row"><div class="bar-label">bluetooth</div><div class="bar-track" title="bluetooth: 1 raw, 0 after approved VEX"><div class="bar raw" style="width:100.0%"></div><div class="bar-val" style="top:2px;left:100.0%">1</div><div class="bar post" style="width:0.0%"></div><div class="bar-val" style="top:18px;left:0.0%">0</div></div></div><div class="bar-row"><div class="bar-label">network-facing</div><div class="bar-track" title="network-facing: 1 raw, 1 after approved VEX"><div class="bar raw" style="width:100.0%"></div><div class="bar-val" style="top:2px;left:100.0%">1</div><div class="bar post" style="width:100.0%"></div><div class="bar-val" style="top:18px;left:100.0%">1</div></div></div><div class="bar-row"><div class="bar-label">can-bus</div><div class="bar-track" title="can-bus: 0 raw, 0 after approved VEX"><div class="bar raw" style="width:0.0%"></div><div class="bar-val" style="top:2px;left:0.0%">0</div><div class="bar post" style="width:0.0%"></div><div class="bar-val" style="top:18px;left:0.0%">0</div></div></div><div class="bar-row"><div class="bar-label">ota-update</div><div class="bar-track" title="ota-update: 0 raw, 0 after approved VEX"><div class="bar raw" style="width:0.0%"></div><div class="bar-val" style="top:2px;left:0.0%">0</div><div class="bar post" style="width:0.0%"></div><div class="bar-val" style="top:18px;left:0.0%">0</div></div></div><div class="bar-row"><div class="bar-label">diagnostics</div><div class="bar-track" title="diagnostics: 0 raw, 0 after approved VEX"><div class="bar raw" style="width:0.0%"></div><div class="bar-val" style="top:2px;left:0.0%">0</div><div class="bar post" style="width:0.0%"></div><div class="bar-val" style="top:18px;left:0.0%">0</div></div></div><div class="bar-row"><div class="bar-label">crypto</div><div class="bar-track" title="crypto: 0 raw, 0 after approved VEX"><div class="bar raw" style="width:0.0%"></div><div class="bar-val" style="top:2px;left:0.0%">0</div><div class="bar post" style="width:0.0%"></div><div class="bar-val" style="top:18px;left:0.0%">0</div></div></div><div class="bar-row"><div class="bar-label">base-system</div><div class="bar-track" title="base-system: 1 raw, 1 after approved VEX"><div class="bar raw" style="width:100.0%"></div><div class="bar-val" style="top:2px;left:100.0%">1</div><div class="bar post" style="width:100.0%"></div><div class="bar-val" style="top:18px;left:100.0%">1</div></div></div><details><summary>Data table</summary><table><tr><th>Category</th><th class=num>Raw CVEs</th><th class=num>Suppressed (approved VEX)</th><th class=num>Actionable</th></tr><tr><td>bluetooth</td><td class=num>1</td><td class=num>1</td><td class=num>0</td></tr><tr><td>network-facing</td><td class=num>1</td><td class=num>0</td><td class=num>1</td></tr><tr><td>can-bus</td><td class=num>0</td><td class=num>0</td><td class=num>0</td></tr><tr><td>ota-update</td><td class=num>0</td><td class=num>0</td><td class=num>0</td></tr><tr><td>diagnostics</td><td class=num>0</td><td class=num>0</td><td class=num>0</td></tr><tr><td>crypto</td><td class=num>0</td><td class=num>0</td><td class=num>0</td></tr><tr><td>base-system</td><td class=num>1</td><td class=num>0</td><td class=num>1</td></tr></table></details>
+</div>
+
+<div class="card">
+<h2 style="margin-top:0">Runtime drift timeline</h2>
+<div class="evt"><time>2026-09-06T08:51:40Z</time><span class="badge critical">✖ critical</span><span>library-hash-mismatch: /tmp/claude-0/-home-user-AutoSBOM-Sentinel/07bc16d6-3057-5ce7-9969-678b209de9e1/scratchpad/smoke/tamperlib/libdemo.so.1 baseline=0e6083d4bcc7fe49… current=52f80e4f444d686f…</span></div><div class="evt"><time>2026-09-06T08:51:40Z</time><span class="badge warning">⚠ sweep w/ drift</span><span>1 drift events this sweep</span></div>
+</div>
+
+<p class="footnote">Personal portfolio project — generated by autosbom-sentinel
+0.1.0. Not a production compliance system.</p>
+</main></body></html>

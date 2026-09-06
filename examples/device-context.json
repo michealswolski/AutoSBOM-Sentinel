@@ -1,0 +1,14 @@
+{
+  "device_name": "pi5-ivi-demo",
+  "features": {
+    "bluetooth": true,
+    "bluetooth.avrcp": false,
+    "bluetooth.a2dp": true,
+    "wifi": true,
+    "network.ssh": false
+  },
+  "network_isolated_components": [],
+  "local_access_possible": true,
+  "not_in_execute_path": [],
+  "notes": "Demo IVI configuration on Raspberry Pi 5. Bluetooth enabled with the AVRCP profile disabled (bluetoothd --noplugin=avrcp) — the PerfektBlue CVE-2024-45434 demo scenario. SSH disabled in the deployed image. Every field here is a human-asserted fact about the device; VEX proposals derived from it still require named human approval before anything is suppressed."
+}
