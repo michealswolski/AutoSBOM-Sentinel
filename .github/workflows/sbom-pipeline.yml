@@ -27,6 +27,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Toolcache Python: the runner's system Python is externally managed
+      # (PEP 668) and rejects bare `pip install`.
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install autosbom
+        run: python3 -m pip install -e .
+
       - name: Generate SBOM (Syft)
         uses: anchore/sbom-action@v0
         with:
@@ -45,7 +54,6 @@ jobs:
 
       - name: Apply approved VEX filter
         run: |
-          pip install -e .
           cp "${{ steps.grype.outputs.json }}" grype-findings.json
           # Only APPROVED statements in the checked-in review store suppress
           # anything; the store is reviewed like code (see autosbom vex).
