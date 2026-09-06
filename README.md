@@ -97,7 +97,7 @@ Per-piece status, precisely:
 | All Python modules (Stages 0-3, VEX gate, dashboard, CLI) | Implemented; **50 unit/integration tests pass** (synthetic fixtures + live filesystem sweeps in a Linux container) |
 | Drift detection end-to-end | Exercised live in a Linux container: baseline of 987 real libraries + 686 packages, clean sweep = 0 events, tamper demo caught as critical within one sweep. **Not yet run on the target Raspberry Pi 5**, and the 24-hour zero-false-alarm run is still to be performed |
 | Stage 0 real benchmark numbers (AGL images, Syft/Trivy/EMBA) | **Not yet produced** — the harness is ready; follow `docs/06_STAGE0_RUNBOOK.md`. No numbers are claimed until measured |
-| cosign keyless signing loop | Scripts + CI workflow written; daemon-side verification policy unit-tested. **Not yet exercised end-to-end** (needs a real OIDC session) |
+| cosign keyless signing | **Exercised end-to-end in CI**: the pipeline's `cosign sign-blob` step succeeded on a real run (Rekor-logged, Fulcio cert emitted). GitHub provenance attestation is unavailable on user-owned private repos and auto-activates when the repo is public. Key-based device flow **not yet run on the Pi** |
 | Dependency-Track live dashboard | Wiring documented + CI upload step written; **not yet stood up and verified** |
 | Demo firmware (vcan/ICSim, UDS sim, BlueZ scenario) | Scripts implemented; **not yet run on the target Pi** (need kernel modules / hardware) |
 | Demo video | Not recorded |

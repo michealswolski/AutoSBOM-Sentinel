@@ -44,7 +44,9 @@ Keep `cosign.key` off the device — the device only ever needs `cosign.pub`.
 
 The scripts and the daemon-side verification policy are implemented and the
 policy behavior is unit-tested (a missing/failed verification is rejected).
-End-to-end keyless signing needs a real OIDC session (CI or interactive
-browser login) and has **not** been exercised inside this repository's
-development environment — run the CI workflow or the scripts locally to
-confirm before claiming the signing loop works end-to-end.
+**Keyless cosign signing of the SBOM has been exercised end-to-end in the CI
+pipeline** (the `Sign SBOM (cosign keyless)` step succeeded on a real run,
+producing a Rekor-logged signature + Fulcio certificate). GitHub's artifact
+attestation step is unavailable on user-owned private repositories and is
+guarded to activate when the repo is public. The key-based device flow for
+the drift baseline has **not** yet been run on the target Pi.
