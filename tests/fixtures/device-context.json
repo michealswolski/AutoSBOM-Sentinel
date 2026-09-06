@@ -1,0 +1,12 @@
+{
+  "device_name": "pi5-ivi-demo",
+  "features": {
+    "bluetooth": true,
+    "bluetooth.avrcp": false,
+    "wifi": true
+  },
+  "network_isolated_components": ["zlib"],
+  "local_access_possible": true,
+  "not_in_execute_path": ["libpng"],
+  "notes": "Demo IVI configuration: Bluetooth on, AVRCP profile disabled (PerfektBlue demo scenario)."
+}

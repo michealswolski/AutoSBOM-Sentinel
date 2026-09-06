@@ -1,0 +1,31 @@
+{
+  "matches": [
+    {
+      "vulnerability": {
+        "id": "CVE-2024-45434",
+        "severity": "Critical",
+        "cvss": [{"metrics": {"baseScore": 8.0}}],
+        "fix": {"versions": []}
+      },
+      "artifact": {"name": "bluez5", "version": "5.66", "type": "deb", "purl": "pkg:deb/bluez5@5.66"}
+    },
+    {
+      "vulnerability": {
+        "id": "CVE-2023-0464",
+        "severity": "High",
+        "cvss": [{"metrics": {"baseScore": 7.5}}],
+        "fix": {"versions": ["3.0.8"]}
+      },
+      "artifact": {"name": "openssl", "version": "3.0.7", "type": "binary", "purl": "pkg:generic/openssl@3.0.7"}
+    },
+    {
+      "vulnerability": {
+        "id": "CVE-2022-9999",
+        "severity": "Medium",
+        "cvss": [],
+        "fix": {"versions": []}
+      },
+      "artifact": {"name": "zlib", "version": "1.2.13", "type": "binary", "purl": "pkg:generic/zlib@1.2.13"}
+    }
+  ]
+}

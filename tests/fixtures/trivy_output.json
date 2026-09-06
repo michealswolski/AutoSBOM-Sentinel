@@ -1,0 +1,40 @@
+{
+  "ArtifactName": "/extracted/rootfs",
+  "Results": [
+    {
+      "Target": "rootfs",
+      "Type": "debian",
+      "Packages": [
+        {"Name": "openssl", "Version": "3.0.7"},
+        {"Name": "zlib1g", "Version": "1.2.13"},
+        {"Name": "bluez5", "Version": "5.66"}
+      ],
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2023-0464",
+          "PkgName": "openssl",
+          "InstalledVersion": "3.0.7",
+          "FixedVersion": "3.0.8",
+          "Severity": "HIGH",
+          "Title": "openssl: Denial of service by excessive resource usage in verifying X509 policy constraints",
+          "CVSS": {"nvd": {"V3Score": 7.5}}
+        },
+        {
+          "VulnerabilityID": "CVE-2024-45434",
+          "PkgName": "bluez5",
+          "InstalledVersion": "5.66",
+          "Severity": "CRITICAL",
+          "Title": "Use-after-free in AVRCP service",
+          "CVSS": {"nvd": {"V3Score": 8.0}}
+        },
+        {
+          "VulnerabilityID": "CVE-2022-9999",
+          "PkgName": "zlib1g",
+          "InstalledVersion": "1.2.13",
+          "Severity": "MEDIUM",
+          "Title": "synthetic backported issue in inflate handling over network streams"
+        }
+      ]
+    }
+  ]
+}

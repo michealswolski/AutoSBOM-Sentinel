@@ -1,0 +1,58 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "synthetic-agl-style-image",
+  "documentNamespace": "https://example.test/synthetic-agl-style-image",
+  "creationInfo": {
+    "created": "2026-01-15T00:00:00Z",
+    "creators": ["Tool: yocto-spdx"]
+  },
+  "packages": [
+    {
+      "SPDXID": "SPDXRef-Package-0",
+      "name": "openssl",
+      "versionInfo": "3.0.8",
+      "downloadLocation": "NOASSERTION",
+      "licenseConcluded": "Apache-2.0",
+      "externalRefs": [
+        {"referenceCategory": "PACKAGE-MANAGER", "referenceType": "purl", "referenceLocator": "pkg:generic/openssl@3.0.8"}
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-Package-1",
+      "name": "zlib",
+      "versionInfo": "1.2.13",
+      "downloadLocation": "NOASSERTION",
+      "licenseConcluded": "Zlib"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-2",
+      "name": "busybox",
+      "versionInfo": "1.36.0",
+      "downloadLocation": "NOASSERTION",
+      "licenseConcluded": "GPL-2.0-only"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-3",
+      "name": "bluez5",
+      "versionInfo": "5.66",
+      "downloadLocation": "NOASSERTION",
+      "licenseConcluded": "GPL-2.0-or-later"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-4",
+      "name": "glibc",
+      "versionInfo": "2.37",
+      "downloadLocation": "NOASSERTION",
+      "licenseConcluded": "LGPL-2.1-only"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-5",
+      "name": "wpa-supplicant",
+      "versionInfo": "2.10",
+      "downloadLocation": "NOASSERTION",
+      "licenseConcluded": "BSD-3-Clause"
+    }
+  ]
+}

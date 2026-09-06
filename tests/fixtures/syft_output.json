@@ -1,0 +1,10 @@
+{
+  "artifacts": [
+    {"name": "openssl", "version": "3.0.7", "type": "binary", "purl": "pkg:generic/openssl@3.0.7", "cpes": ["cpe:2.3:a:openssl:openssl:3.0.7:*:*:*:*:*:*:*"], "licenses": [{"value": "Apache-2.0"}]},
+    {"name": "zlib1g", "version": "1.2.13", "type": "deb", "purl": "pkg:deb/zlib1g@1.2.13"},
+    {"name": "busybox", "version": "", "type": "binary", "purl": "pkg:generic/busybox"},
+    {"name": "libpng", "version": "1.6.39", "type": "binary", "purl": "pkg:generic/libpng@1.6.39"},
+    {"name": "libc6", "version": "2.37", "type": "deb", "purl": "pkg:deb/libc6@2.37"}
+  ],
+  "source": {"target": "/extracted/rootfs"}
+}
