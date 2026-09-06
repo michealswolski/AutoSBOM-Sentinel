@@ -44,16 +44,18 @@ jobs:
           output-file: sbom.cdx.json
           upload-artifact: false
 
+      # Install current grype via the official script: the version pinned by
+      # scan-action@v4 ships a retired DB schema whose feed is stale ("built
+      # 25 weeks ago, max allowed age is 5 days"), so scans fail or come back
+      # empty.
       - name: Install Grype
-        uses: anchore/scan-action/download-grype@v4
-        id: grype-install
+        run: |
+          curl -sSfL https://get.anchore.io/grype | sudo sh -s -- -b /usr/local/bin
+          grype version
 
-      # Run grype directly so the JSON report lands in a file we control —
-      # the wrapper action's json output produced an empty file on this repo.
       - name: Scan (Grype)
         run: |
-          "${{ steps.grype-install.outputs.cmd }}" sbom:sbom.cdx.json \
-            -o json --file grype-findings.json
+          grype sbom:sbom.cdx.json -o json --file grype-findings.json
           python3 -c "import json; json.load(open('grype-findings.json'))" \
             || { echo "grype produced invalid JSON" >&2; exit 1; }
 
