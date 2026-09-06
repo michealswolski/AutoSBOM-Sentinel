@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+dist/
+build/
+autosbom-work/
+autosbom-out/
+drift-events.jsonl
+vex-review.json
+.venv/
