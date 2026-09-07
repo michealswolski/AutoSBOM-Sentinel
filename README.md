@@ -99,7 +99,10 @@ runtime dependencies and runs on a stock Raspberry Pi Python 3.9+.
 ## Honest status ledger
 
 This is a personal portfolio project, not a production or certified system.
-Per-piece status, precisely:
+Per-piece status, precisely. Every "not yet" row below has a mechanical,
+copy-paste checklist in **[`docs/07_HARDWARE_RUNBOOK.md`](docs/07_HARDWARE_RUNBOOK.md)**
+waiting on physical hardware and unrestricted internet — neither of which
+the environment that built this repo had.
 
 | Piece | Status |
 |---|---|
