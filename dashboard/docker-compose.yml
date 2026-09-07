@@ -1,0 +1,46 @@
+# OWASP Dependency-Track -- the live backend referenced in dashboard/README.md.
+# Run: docker compose -f dashboard/docker-compose.yml up -d
+# Then open http://localhost:8080 (default login admin/admin -- change it
+# immediately) once dtrack-frontend/verify.sh reports the API is healthy.
+#
+# Memory limits below are the official project's documented minimum for a
+# small/personal instance; raise them if analysis feels slow on a larger
+# SBOM. This file matches the layout published at
+# https://dependencytrack.org/docker-compose.yml (services/volumes/ports),
+# adjusted only for a lower memory floor appropriate to a personal project
+# rather than an org-scale deployment.
+services:
+  dtrack-apiserver:
+    image: dependencytrack/apiserver
+    deploy:
+      resources:
+        limits:
+          memory: 8192m
+        reservations:
+          memory: 4096m
+      restart_policy:
+        condition: on-failure
+    ports:
+      - "8081:8080"
+    volumes:
+      - dependency-track:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 180s
+
+  dtrack-frontend:
+    image: dependencytrack/frontend
+    depends_on:
+      - dtrack-apiserver
+    ports:
+      - "8080:8080"
+    environment:
+      API_BASE_URL: http://localhost:8081
+    restart: unless-stopped
+
+volumes:
+  dependency-track: {}

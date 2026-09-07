@@ -19,10 +19,14 @@ Two halves:
 ## Running Dependency-Track locally
 
 ```sh
-curl -LO https://dependencytrack.org/docker-compose.yml
-docker compose up -d
-# UI on http://localhost:8080 (initial login admin/admin, change it)
+./dashboard/verify.sh
 ```
+
+This validates `dashboard/docker-compose.yml`, brings Dependency-Track up,
+and polls until the API reports healthy and the frontend actually serves
+the UI — not just "docker compose exited 0". On success: UI at
+http://localhost:8080 (initial login admin/admin — change it immediately),
+API at http://localhost:8081.
 
 Upload a build manually:
 
@@ -40,8 +44,18 @@ project so suppressions carry into the live view.
 ## Status / honesty note
 
 The HTML report generator is implemented and unit-tested, and rendered
-output was visually verified in light mode. The Dependency-Track wiring
-above is standard, documented usage but has **not** been stood up and
-verified from inside this repository's development environment — do that
-once locally before demoing it. The 60-90 second demo video is not yet
-recorded.
+output was visually verified in light mode.
+
+The Dependency-Track deployment (`docker-compose.yml` + `verify.sh`) was
+validated as far as this development environment's network policy allows:
+the compose file's syntax/schema was confirmed valid (`docker compose
+config`), and `docker compose up` was run for real — it correctly resolved
+and began pulling both official images before the container image layer
+download was blocked by this sandbox's organizational egress policy
+(`production.cloudfront.docker.com` — Docker Hub's CDN — is not on this
+session's allowed-hosts list; confirmed via the proxy's own status
+endpoint, which explicitly says to report such a block rather than route
+around it). **The actual running service has not been verified end-to-end**
+— run `./dashboard/verify.sh` on a machine with normal internet access to
+do that; it will report clearly if anything about the setup itself is
+wrong. The 60-90 second demo video is not yet recorded.
