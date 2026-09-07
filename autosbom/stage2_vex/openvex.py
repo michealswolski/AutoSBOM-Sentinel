@@ -10,6 +10,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime, timezone
 
+from .. import __version__
 from .rules import VexProposal
 
 OPENVEX_CONTEXT = "https://openvex.dev/ns/v0.2.0"
@@ -19,7 +20,7 @@ def export_openvex(
     proposals: list[VexProposal],
     author: str,
     product_purl: str,
-    tooling: str = "autosbom-sentinel/0.1.0",
+    tooling: str = f"autosbom-sentinel/{__version__}",
 ) -> dict:
     """Build an OpenVEX document from approved proposals.
 

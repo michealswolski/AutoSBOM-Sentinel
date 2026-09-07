@@ -4,11 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "autosbom-sentinel"
-version = "0.1.0"
+version = "0.2.0"
 description = "Automotive-aware SBOM generation, VEX false-positive reduction, and runtime drift detection (personal portfolio project)"
 readme = "README.md"
 requires-python = ">=3.9"
 license = { file = "LICENSE" }
+authors = [{ name = "Micheal Wolski" }]
+urls = { Repository = "https://github.com/michealswolski/AutoSBOM-Sentinel" }
 keywords = ["sbom", "cyclonedx", "spdx", "vex", "automotive", "firmware", "supply-chain"]
 classifiers = [
     "Development Status :: 3 - Alpha",

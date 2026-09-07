@@ -5,6 +5,8 @@ import re
 from dataclasses import dataclass, field, asdict
 from typing import Optional
 
+from .. import __version__
+
 
 def normalize_name(name: str) -> str:
     """Normalize a component name for cross-tool comparison.
@@ -86,7 +88,7 @@ class Sbom:
     vulnerabilities: list[Vulnerability] = field(default_factory=list)
     target: str = ""               # what was scanned (path / image name)
     tool: str = "autosbom-sentinel"
-    tool_version: str = "0.1.0"
+    tool_version: str = __version__
     timestamp: str = ""
 
     def component_keys(self) -> set[str]:

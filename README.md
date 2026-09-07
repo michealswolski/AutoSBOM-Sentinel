@@ -49,9 +49,18 @@ that gap:
 
 ## Install & quick start
 
+This project is **not published to PyPI** — see [License](#license). If
+you've been given permission to use it, clone the repo and install locally
+or straight from git:
+
 ```sh
-pip install -e ".[dev]"        # zero runtime deps; PyYAML optional, pytest for dev
-pytest -q                      # 50 tests
+pip install -e ".[dev]"                                           # from a local clone
+# or, once you have permission:
+pip install "git+https://github.com/michealswolski/AutoSBOM-Sentinel.git"
+```
+
+```sh
+pytest -q                      # 64 tests (1 skipped without optional PyYAML)
 
 # Stage 0 (with saved tool outputs):
 autosbom benchmark --ground-truth image.spdx.json \
@@ -94,10 +103,11 @@ Per-piece status, precisely:
 
 | Piece | Status |
 |---|---|
-| All Python modules (Stages 0-3, VEX gate, dashboard, CLI) | Implemented; **50 unit/integration tests pass** (synthetic fixtures + live filesystem sweeps in a Linux container) |
+| All Python modules (Stages 0-3, VEX gate, dashboard, CLI) | Implemented; **64 unit/integration tests pass** (synthetic fixtures + live filesystem sweeps in a Linux container) |
 | Drift detection end-to-end | Exercised live in a Linux container: baseline of 987 real libraries + 686 packages, clean sweep = 0 events, tamper demo caught as critical within one sweep. **Not yet run on the target Raspberry Pi 5**, and the 24-hour zero-false-alarm run is still to be performed |
 | Stage 0 real benchmark numbers (AGL images, Syft/Trivy/EMBA) | **Not yet produced** — the harness is ready; follow `docs/06_STAGE0_RUNBOOK.md`. No numbers are claimed until measured |
-| cosign keyless signing | **Exercised end-to-end in CI**: the pipeline's `cosign sign-blob` step succeeded on a real run (Rekor-logged, Fulcio cert emitted). GitHub provenance attestation is unavailable on user-owned private repos and auto-activates when the repo is public. Key-based device flow **not yet run on the Pi** |
+| cosign keyless signing + provenance attestation | **Fully exercised end-to-end in CI**: `cosign sign-blob` and GitHub's build-provenance attestation have both succeeded on real runs against the now-public repo (Rekor-logged, Fulcio certs emitted; see the [attestations tab](https://github.com/michealswolski/AutoSBOM-Sentinel/attestations)). Key-based device flow **not yet run on the Pi** |
+| Real (non-fabricated) vulnerability findings through the full pipeline | **Verified**: a triggered CI run against `demo-target/`'s deliberately-old pinned packages reported 120 real findings, 0 pre-suppressed, flowing through Syft → Grype → VEX filter → signed report |
 | Dependency-Track live dashboard | Wiring documented + CI upload step written; **not yet stood up and verified** |
 | Demo firmware (vcan/ICSim, UDS sim, BlueZ scenario) | Scripts implemented; **not yet run on the target Pi** (need kernel modules / hardware) |
 | Demo video | Not recorded |
@@ -129,7 +139,7 @@ Per-piece status, precisely:
 
 ```
 autosbom/            the Python package (stages 0-3, dashboard, CLI)
-tests/               50 tests + synthetic fixtures
+tests/               64 tests + synthetic fixtures
 docs/                project brief, architecture, research (with corrections),
                      build plan, hardware/software BOM, Stage 0 runbook
 signing/             cosign sign/verify scripts
@@ -157,3 +167,5 @@ project: any use beyond evaluating the code (running, deploying, modifying,
 or redistributing it, or incorporating it into another project) requires
 prior written permission from the author. To request permission, contact
 via LinkedIn: https://www.linkedin.com/in/michealwolski
+
+See [CHANGELOG.md](CHANGELOG.md) for release history.
