@@ -135,6 +135,8 @@ docs/                project brief, architecture, research (with corrections),
 signing/             cosign sign/verify scripts
 dashboard/           Dependency-Track wiring notes
 demo-firmware/       vcan/ICSim, UDS simulator, OTA stub, PerfektBlue scenario
+demo-target/         deliberately-vulnerable fixture -- gives the CI pipeline
+                     real CVEs to find; not a real dependency, never installed
 examples/            sample device-context
 .github/workflows/   CI (tests) + SBOM "continuous compliance" pipeline
 ```

@@ -1,0 +1,17 @@
+# DELIBERATE DEMO FIXTURE -- DO NOT `pip install -r` THIS FILE.
+#
+# See demo-target/README.md. These are old, pinned versions of real
+# packages chosen ONLY so the CI pipeline's Syft+Grype scan has genuine,
+# non-fabricated vulnerabilities to find and report on -- proving the
+# generate -> scan -> VEX-filter -> sign chain against real data instead
+# of the tool's own (intentionally zero-dependency) source, which always
+# scans clean. Nothing in this file is installed, imported, or executed
+# by AutoSBOM-Sentinel itself.
+Django==1.11
+Flask==0.12
+requests==2.6.0
+urllib3==1.24.1
+PyYAML==3.13
+Pillow==6.2.0
+cryptography==2.3
+Jinja2==2.10
