@@ -150,4 +150,8 @@ see the status ledger above.
 
 ## License
 
-MIT
+**All Rights Reserved** — see [LICENSE](LICENSE). This is not an open-source
+project: any use beyond evaluating the code (running, deploying, modifying,
+or redistributing it, or incorporating it into another project) requires
+prior written permission from the author. To request permission, contact
+via LinkedIn: https://www.linkedin.com/in/michealwolski
