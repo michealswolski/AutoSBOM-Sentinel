@@ -75,6 +75,54 @@ def test_grype_parser_malformed_json(tmp_path):
         ta.parse_grype_json(bad)
 
 
+def test_grype_parser_rejects_wrong_shape(tmp_path):
+    # Syntactically-valid JSON that isn't grype's expected object shape
+    # (e.g. a bare list) must not fall through to a raw AttributeError
+    # from calling .get() on a list.
+    wrong_shape = tmp_path / "grype.json"
+    wrong_shape.write_text("[1, 2, 3]")
+    with pytest.raises(ValueError, match="doesn't look like grype JSON output"):
+        ta.parse_grype_json(wrong_shape)
+
+
+def test_syft_parser_rejects_wrong_shape(tmp_path):
+    wrong_shape = tmp_path / "syft.json"
+    wrong_shape.write_text("[1, 2, 3]")
+    with pytest.raises(ValueError, match="doesn't look like syft JSON output"):
+        ta.parse_syft_json(wrong_shape)
+
+
+def test_trivy_parser_rejects_wrong_shape(tmp_path):
+    wrong_shape = tmp_path / "trivy.json"
+    wrong_shape.write_text("[1, 2, 3]")
+    with pytest.raises(ValueError, match="doesn't look like trivy JSON output"):
+        ta.parse_trivy_json(wrong_shape)
+
+
+def test_cyclonedx_parser_rejects_wrong_shape(tmp_path):
+    wrong_shape = tmp_path / "cdx.json"
+    wrong_shape.write_text("[1, 2, 3]")
+    with pytest.raises(ValueError, match="doesn't look like CycloneDX JSON output"):
+        ta.parse_cyclonedx_json(wrong_shape)
+
+
+def test_cli_wrong_shape_findings_exits_clean_not_traceback(tmp_path, capsys):
+    """End-to-end: a syntactically-valid but wrong-shaped grype findings
+    file must produce a clean CLI error, not an uncaught AttributeError."""
+    ctx = tmp_path / "context.json"
+    ctx.write_text('{"device_name": "d"}')
+    wrong_shape = tmp_path / "findings.grype.json"
+    wrong_shape.write_text("[1, 2, 3]")
+    rc = main([
+        "vex", "--review-store", str(tmp_path / "review.json"), "propose",
+        "--findings", str(wrong_shape), "--context", str(ctx),
+    ])
+    assert rc == 1
+    err = capsys.readouterr().err
+    assert err.startswith("error:")
+    assert "Traceback" not in err
+
+
 def test_device_context_rejects_non_object(tmp_path):
     bad = tmp_path / "context.json"
     bad.write_text("[1, 2, 3]")

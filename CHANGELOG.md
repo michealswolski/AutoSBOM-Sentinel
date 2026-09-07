@@ -6,6 +6,17 @@ versioning follows [Semantic Versioning](https://semver.org/) once the
 project reaches 1.0 — before that, minor bumps mark meaningful checkpoints
 rather than strict API stability guarantees.
 
+## [Unreleased]
+
+### Fixed
+- `autosbom/stage0_benchmark/tool_adapters.py`: the Syft/Trivy/Grype/CycloneDX
+  JSON parsers now validate the parsed document is an object before reading
+  fields from it, matching every other loader hardened in 0.2.0. A
+  syntactically-valid but wrong-shaped file (e.g. a bare JSON array) previously
+  crashed with a raw `AttributeError` traceback instead of a clean, file-named
+  error — found by a follow-up code review. 5 new regression tests
+  (`tests/test_hardening.py`); suite is now 69 of 70 tests passing.
+
 ## [0.2.0] — 2026-09-07
 
 ### Changed
