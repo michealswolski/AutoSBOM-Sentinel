@@ -108,7 +108,7 @@ Per-piece status, precisely:
 | Stage 0 real benchmark numbers (AGL images, Syft/Trivy/EMBA) | **Not yet produced** — the harness is ready; follow `docs/06_STAGE0_RUNBOOK.md`. No numbers are claimed until measured |
 | cosign keyless signing + provenance attestation | **Fully exercised end-to-end in CI**: `cosign sign-blob` and GitHub's build-provenance attestation have both succeeded on real runs against the now-public repo (Rekor-logged, Fulcio certs emitted; see the [attestations tab](https://github.com/michealswolski/AutoSBOM-Sentinel/attestations)). Key-based device flow **not yet run on the Pi** |
 | Real (non-fabricated) vulnerability findings through the full pipeline | **Verified**: a triggered CI run against `demo-target/`'s deliberately-old pinned packages reported 120 real findings, 0 pre-suppressed, flowing through Syft → Grype → VEX filter → signed report |
-| Dependency-Track live dashboard | Wiring documented + CI upload step written; **not yet stood up and verified** |
+| Dependency-Track live dashboard | `dashboard/docker-compose.yml` + `dashboard/verify.sh` written; compose syntax validated and `docker compose up` confirmed to correctly begin pulling both official images. **The running service itself could not be verified from this sandbox** — its network policy blocks Docker Hub's image CDN (confirmed via the proxy's own status endpoint as an intentional block, not a setup bug). Run `./dashboard/verify.sh` on a machine with normal internet access |
 | Demo firmware (vcan/ICSim, UDS sim, BlueZ scenario) | Scripts implemented; **not yet run on the target Pi** (need kernel modules / hardware) |
 | Demo video | Not recorded |
 
@@ -143,7 +143,7 @@ tests/               64 tests + synthetic fixtures
 docs/                project brief, architecture, research (with corrections),
                      build plan, hardware/software BOM, Stage 0 runbook
 signing/             cosign sign/verify scripts
-dashboard/           Dependency-Track wiring notes
+dashboard/           Dependency-Track docker-compose.yml + verify.sh
 demo-firmware/       vcan/ICSim, UDS simulator, OTA stub, PerfektBlue scenario
 demo-target/         deliberately-vulnerable fixture -- gives the CI pipeline
                      real CVEs to find; not a real dependency, never installed
