@@ -1,0 +1,13 @@
+{
+  "name": "autosbom-demo-target",
+  "private": true,
+  "description": "DELIBERATE DEMO FIXTURE -- see demo-target/README.md. Old, pinned npm packages with publicly-documented CVEs, added alongside requirements.txt to give the CI pipeline a second ecosystem's worth of real findings (broader heatmap coverage) instead of only Python. Never run `npm install` here.",
+  "dependencies": {
+    "lodash": "4.17.15",
+    "minimist": "0.0.8",
+    "node-forge": "0.6.0",
+    "express": "4.16.0",
+    "axios": "0.18.0",
+    "yargs-parser": "5.0.0"
+  }
+}
