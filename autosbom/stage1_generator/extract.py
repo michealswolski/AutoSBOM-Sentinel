@@ -8,9 +8,10 @@ the generated SBOM's metadata is honest about how the tree was obtained.
 from __future__ import annotations
 
 import shutil
-import subprocess
 from dataclasses import dataclass
 from pathlib import Path
+
+from ..common.io_utils import run_subprocess_or_raise
 
 
 @dataclass
@@ -39,22 +40,11 @@ def extract(target: str | Path, workdir: str | Path) -> ExtractionResult:
             "the image manually and pass the extracted directory instead."
         )
 
-    try:
-        subprocess.run(
-            ["binwalk", "--extract", "--directory", str(workdir), str(target)],
-            check=True,
-            capture_output=True,
-            text=True,
-            timeout=3600,
-        )
-    except subprocess.CalledProcessError as exc:
-        raise RuntimeError(
-            f"binwalk failed extracting {target} (exit {exc.returncode}): "
-            f"{(exc.stderr or '').strip()[:500]}"
-        ) from exc
-    except subprocess.TimeoutExpired as exc:
-        raise RuntimeError(f"binwalk did not finish extracting {target} "
-                           f"within 3600s") from exc
+    run_subprocess_or_raise(
+        ["binwalk", "--extract", "--directory", str(workdir), str(target)],
+        timeout=3600,
+        error_label=f"binwalk extracting {target}",
+    )
     # binwalk extracts into _<name>.extracted under the output directory
     candidates = sorted(workdir.glob("_*.extracted"))
     root = candidates[0] if candidates else workdir

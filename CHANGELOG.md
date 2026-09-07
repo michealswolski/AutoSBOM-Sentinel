@@ -23,7 +23,7 @@ rather than strict API stability guarantees.
   versions) so the CI pipeline's Syft+Grype scan has real, non-fabricated
   CVEs to find, filter, and report on — verified live: a triggered run
   reported 120 real findings.
-- 14 new tests covering the hardening changes (`tests/test_hardening.py`).
+- 15 new tests covering the hardening changes (`tests/test_hardening.py`).
 
 ## [0.1.0] — 2026-09-06
 
