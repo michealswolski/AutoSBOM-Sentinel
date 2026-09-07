@@ -29,3 +29,13 @@ more categories to actually light up than a single-ecosystem scan would.
 This is the same mechanism a real user would rely on when scanning their
 own project — demonstrated here on a fixture instead of on someone else's
 real, possibly-still-in-use dependency tree.
+
+**Correction, measured on a real run**: a bare `package.json` with no
+lockfile was *not* enough — a triggered pipeline run with only
+`package.json` present produced an artifact only 64 bytes larger than the
+Python-only baseline (148,453 vs 148,389 bytes), meaning Syft's javascript
+cataloger did not pick up any npm components from it in this
+configuration. `package-lock.json` (added alongside `package.json`) is the
+format Syft's npm-lock cataloger reliably parses — verify any claim like
+this against a real run rather than assuming a tool's documented behavior
+holds for your exact setup.
