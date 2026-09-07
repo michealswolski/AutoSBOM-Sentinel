@@ -9,11 +9,10 @@ on machines without the tools.
 from __future__ import annotations
 
 import shutil
-import subprocess
 from pathlib import Path
 from typing import Optional
 
-from ..common.io_utils import load_json
+from ..common.io_utils import load_json, run_subprocess_or_raise
 from ..common.models import Component, Sbom, Vulnerability
 
 
@@ -198,19 +197,7 @@ def tool_available(name: str) -> bool:
 
 def _run_and_capture(cmd: list[str], timeout: int) -> str:
     """Run an external scanner, raising RuntimeError with its stderr on failure."""
-    tool = cmd[0]
-    try:
-        result = subprocess.run(cmd, capture_output=True, text=True,
-                                check=True, timeout=timeout)
-    except subprocess.CalledProcessError as exc:
-        raise RuntimeError(
-            f"{tool} exited with status {exc.returncode}: "
-            f"{(exc.stderr or '').strip()[:500]}"
-        ) from exc
-    except subprocess.TimeoutExpired as exc:
-        raise RuntimeError(f"{tool} did not finish within {timeout}s "
-                           f"(command: {' '.join(cmd)})") from exc
-    return result.stdout
+    return run_subprocess_or_raise(cmd, timeout)
 
 
 def run_syft(target: str, out_path: str | Path) -> Optional[Sbom]:
