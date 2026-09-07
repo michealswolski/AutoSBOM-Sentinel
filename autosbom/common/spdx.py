@@ -9,16 +9,19 @@ this is not a full SPDX library.
 """
 from __future__ import annotations
 
-import json
 from datetime import datetime, timezone
 from pathlib import Path
 
+from .io_utils import load_json
 from .models import Component, Sbom
 
 
 def load_spdx_json(path: str | Path) -> Sbom:
     """Load an SPDX 2.x JSON document into an Sbom."""
-    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    data = load_json(path)
+    if not isinstance(data, dict) or "packages" not in data:
+        raise ValueError(f"{path}: doesn't look like an SPDX document "
+                         f"(missing top-level 'packages' array)")
     components: list[Component] = []
     for pkg in data.get("packages", []):
         name = pkg.get("name", "")

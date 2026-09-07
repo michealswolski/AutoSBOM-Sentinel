@@ -17,6 +17,8 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 
+from ..common.io_utils import load_json
+
 DEFAULT_LIB_DIRS = ["/lib", "/usr/lib", "/lib64", "/usr/lib64", "/usr/local/lib"]
 
 
@@ -56,7 +58,11 @@ class Inventory:
 
     @classmethod
     def load(cls, path: str | Path) -> "Inventory":
-        return cls.from_dict(json.loads(Path(path).read_text(encoding="utf-8")))
+        data = load_json(path)
+        if not isinstance(data, dict):
+            raise ValueError(f"{path}: inventory/baseline must be a JSON "
+                             f"object, got {type(data).__name__}")
+        return cls.from_dict(data)
 
 
 def _sha256(path: Path) -> str:

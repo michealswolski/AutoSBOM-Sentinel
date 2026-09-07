@@ -8,12 +8,12 @@ on machines without the tools.
 """
 from __future__ import annotations
 
-import json
 import shutil
 import subprocess
 from pathlib import Path
 from typing import Optional
 
+from ..common.io_utils import load_json
 from ..common.models import Component, Sbom, Vulnerability
 
 
@@ -22,7 +22,7 @@ from ..common.models import Component, Sbom, Vulnerability
 # --------------------------------------------------------------------------
 
 def parse_syft_json(path: str | Path) -> Sbom:
-    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    data = load_json(path)
     components = []
     for art in data.get("artifacts", []):
         components.append(
@@ -48,7 +48,7 @@ def parse_syft_json(path: str | Path) -> Sbom:
 # --------------------------------------------------------------------------
 
 def parse_trivy_json(path: str | Path) -> Sbom:
-    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    data = load_json(path)
     components: list[Component] = []
     vulns: list[Vulnerability] = []
     for result in data.get("Results", []) or []:
@@ -93,7 +93,7 @@ def _trivy_cvss(v: dict) -> Optional[float]:
 # --------------------------------------------------------------------------
 
 def parse_grype_json(path: str | Path) -> Sbom:
-    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    data = load_json(path)
     vulns = []
     components: dict[str, Component] = {}
     for m in data.get("matches", []) or []:
@@ -134,7 +134,7 @@ def parse_grype_json(path: str | Path) -> Sbom:
 # --------------------------------------------------------------------------
 
 def parse_cyclonedx_json(path: str | Path, tool_name: str = "cyclonedx") -> Sbom:
-    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    data = load_json(path)
     components = []
     for comp in data.get("components", []) or []:
         c = Component(
@@ -196,15 +196,29 @@ def tool_available(name: str) -> bool:
     return shutil.which(name) is not None
 
 
+def _run_and_capture(cmd: list[str], timeout: int) -> str:
+    """Run an external scanner, raising RuntimeError with its stderr on failure."""
+    tool = cmd[0]
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True,
+                                check=True, timeout=timeout)
+    except subprocess.CalledProcessError as exc:
+        raise RuntimeError(
+            f"{tool} exited with status {exc.returncode}: "
+            f"{(exc.stderr or '').strip()[:500]}"
+        ) from exc
+    except subprocess.TimeoutExpired as exc:
+        raise RuntimeError(f"{tool} did not finish within {timeout}s "
+                           f"(command: {' '.join(cmd)})") from exc
+    return result.stdout
+
+
 def run_syft(target: str, out_path: str | Path) -> Optional[Sbom]:
     """Run syft against a target directory/image; None if syft not installed."""
     if not tool_available("syft"):
         return None
-    out = subprocess.run(
-        ["syft", target, "-o", "json"],
-        capture_output=True, text=True, check=True, timeout=1800,
-    )
-    Path(out_path).write_text(out.stdout, encoding="utf-8")
+    stdout = _run_and_capture(["syft", target, "-o", "json"], timeout=1800)
+    Path(out_path).write_text(stdout, encoding="utf-8")
     return parse_syft_json(out_path)
 
 
@@ -212,9 +226,9 @@ def run_trivy_fs(target: str, out_path: str | Path) -> Optional[Sbom]:
     """Run trivy fs against a directory; None if trivy not installed."""
     if not tool_available("trivy"):
         return None
-    out = subprocess.run(
+    stdout = _run_and_capture(
         ["trivy", "fs", "--format", "json", "--list-all-pkgs", target],
-        capture_output=True, text=True, check=True, timeout=3600,
+        timeout=3600,
     )
-    Path(out_path).write_text(out.stdout, encoding="utf-8")
+    Path(out_path).write_text(stdout, encoding="utf-8")
     return parse_trivy_json(out_path)

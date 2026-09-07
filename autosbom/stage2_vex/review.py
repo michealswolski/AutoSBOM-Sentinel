@@ -18,6 +18,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 
+from ..common.io_utils import load_json
 from .rules import VexProposal
 
 
@@ -35,7 +36,10 @@ class ReviewStore:
         p = Path(path)
         if not p.exists():
             return cls(path=p, proposals=[])
-        data = json.loads(p.read_text(encoding="utf-8"))
+        data = load_json(p)
+        if not isinstance(data, dict):
+            raise ValueError(f"{p}: review store must be a JSON object, "
+                             f"got {type(data).__name__}")
         return cls(
             path=p,
             proposals=[VexProposal.from_dict(d) for d in data.get("proposals", [])],

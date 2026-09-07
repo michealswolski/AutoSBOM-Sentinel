@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import html
 import json
+import sys
 from datetime import datetime, timezone
 
 from ..common.models import Sbom, Vulnerability
@@ -283,13 +284,24 @@ pending proposals still show as raw findings.</p>
 
 
 def load_drift_log(path: str) -> list[dict]:
+    """Load a JSONL drift-event log, tolerating a truncated final line.
+
+    The daemon appends one line per event; a crash or killed process mid-
+    write can leave the last line incomplete. That single bad line must
+    not hide every real event that came before it.
+    """
     events = []
     try:
         with open(path, encoding="utf-8") as f:
-            for line in f:
+            for lineno, line in enumerate(f, start=1):
                 line = line.strip()
-                if line:
+                if not line:
+                    continue
+                try:
                     events.append(json.loads(line))
+                except json.JSONDecodeError:
+                    print(f"warning: {path}:{lineno}: skipping malformed "
+                         f"drift-log line", file=sys.stderr)
     except FileNotFoundError:
         pass
     return events

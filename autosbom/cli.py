@@ -16,6 +16,7 @@ import sys
 from pathlib import Path
 
 from . import __version__
+from .common.io_utils import load_json
 
 
 def _cmd_benchmark(args: argparse.Namespace) -> int:
@@ -85,13 +86,21 @@ def _cmd_vex(args: argparse.Namespace) -> int:
         context = DeviceContext.load(args.context)
         annotations = {}
         if args.annotations:
-            annotations = json.loads(Path(args.annotations).read_text(encoding="utf-8"))
+            annotations = load_json(args.annotations)
+            if not isinstance(annotations, dict):
+                print(f"error: {args.annotations}: expected a JSON object "
+                      f"of CVE annotations", file=sys.stderr)
+                return 2
         if args.findings.endswith(".grype.json") or args.findings_format == "grype":
             findings_sbom = ta.parse_grype_json(args.findings)
         elif args.findings_format == "trivy":
             findings_sbom = ta.parse_trivy_json(args.findings)
         else:
-            data = json.loads(Path(args.findings).read_text(encoding="utf-8"))
+            data = load_json(args.findings)
+            if not isinstance(data, list):
+                print(f"error: {args.findings}: raw findings format expects "
+                      f"a JSON list", file=sys.stderr)
+                return 2
             findings_sbom = type("S", (), {})()
             findings_sbom.vulnerabilities = [Vulnerability.from_dict(d) for d in data]
         engine = RuleEngine(context=context, backport_annotations=annotations)
@@ -299,9 +308,23 @@ def build_parser() -> argparse.ArgumentParser:
     return p
 
 
+# Exceptions the CLI treats as expected operational failures (a bad file, a
+# missing tool, a permissions problem) — reported as a clean one-line error
+# instead of a Python traceback. Anything else is a real bug and is left to
+# surface with its full traceback so it doesn't get silently swallowed.
+_OPERATIONAL_ERRORS = (
+    FileNotFoundError, NotADirectoryError, IsADirectoryError, PermissionError,
+    ValueError, RuntimeError,
+)
+
+
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
-    return args.func(args)
+    try:
+        return args.func(args)
+    except _OPERATIONAL_ERRORS as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
 
 
 if __name__ == "__main__":
