@@ -22,6 +22,9 @@ from ..common.models import Component, Sbom, Vulnerability
 
 def parse_syft_json(path: str | Path) -> Sbom:
     data = load_json(path)
+    if not isinstance(data, dict):
+        raise ValueError(f"{path}: doesn't look like syft JSON output "
+                         f"(expected a JSON object, got {type(data).__name__})")
     components = []
     for art in data.get("artifacts", []):
         components.append(
@@ -48,6 +51,9 @@ def parse_syft_json(path: str | Path) -> Sbom:
 
 def parse_trivy_json(path: str | Path) -> Sbom:
     data = load_json(path)
+    if not isinstance(data, dict):
+        raise ValueError(f"{path}: doesn't look like trivy JSON output "
+                         f"(expected a JSON object, got {type(data).__name__})")
     components: list[Component] = []
     vulns: list[Vulnerability] = []
     for result in data.get("Results", []) or []:
@@ -93,6 +99,9 @@ def _trivy_cvss(v: dict) -> Optional[float]:
 
 def parse_grype_json(path: str | Path) -> Sbom:
     data = load_json(path)
+    if not isinstance(data, dict):
+        raise ValueError(f"{path}: doesn't look like grype JSON output "
+                         f"(expected a JSON object, got {type(data).__name__})")
     vulns = []
     components: dict[str, Component] = {}
     for m in data.get("matches", []) or []:
@@ -134,6 +143,9 @@ def parse_grype_json(path: str | Path) -> Sbom:
 
 def parse_cyclonedx_json(path: str | Path, tool_name: str = "cyclonedx") -> Sbom:
     data = load_json(path)
+    if not isinstance(data, dict):
+        raise ValueError(f"{path}: doesn't look like CycloneDX JSON output "
+                         f"(expected a JSON object, got {type(data).__name__})")
     components = []
     for comp in data.get("components", []) or []:
         c = Component(

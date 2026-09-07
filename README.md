@@ -60,7 +60,7 @@ pip install "git+https://github.com/michealswolski/AutoSBOM-Sentinel.git"
 ```
 
 ```sh
-pytest -q                      # 65 tests (1 skipped without optional PyYAML)
+pytest -q                      # 70 tests (1 skipped without optional PyYAML)
 
 # Stage 0 (with saved tool outputs):
 autosbom benchmark --ground-truth image.spdx.json \
@@ -106,7 +106,7 @@ the environment that built this repo had.
 
 | Piece | Status |
 |---|---|
-| All Python modules (Stages 0-3, VEX gate, dashboard, CLI) | Implemented; **64 of 65 tests pass** (1 skipped without optional PyYAML) (synthetic fixtures + live filesystem sweeps in a Linux container) |
+| All Python modules (Stages 0-3, VEX gate, dashboard, CLI) | Implemented; **69 of 70 tests pass** (1 skipped without optional PyYAML) (synthetic fixtures + live filesystem sweeps in a Linux container) |
 | Drift detection end-to-end | Exercised live in a Linux container: baseline of 987 real libraries + 686 packages, clean sweep = 0 events, tamper demo caught as critical within one sweep. **Not yet run on the target Raspberry Pi 5**, and the 24-hour zero-false-alarm run is still to be performed |
 | Stage 0 real benchmark numbers (AGL images, Syft/Trivy/EMBA) | **Not yet produced** — the harness is ready; follow `docs/06_STAGE0_RUNBOOK.md`. No numbers are claimed until measured |
 | cosign keyless signing + provenance attestation | **Fully exercised end-to-end in CI**: `cosign sign-blob` and GitHub's build-provenance attestation have both succeeded on real runs against the now-public repo (Rekor-logged, Fulcio certs emitted; see the [attestations tab](https://github.com/michealswolski/AutoSBOM-Sentinel/attestations)). Key-based device flow **not yet run on the Pi** |
@@ -142,7 +142,7 @@ the environment that built this repo had.
 
 ```
 autosbom/            the Python package (stages 0-3, dashboard, CLI)
-tests/               65 tests + synthetic fixtures
+tests/               70 tests + synthetic fixtures
 docs/                project brief, architecture, research (with corrections),
                      build plan, hardware/software BOM, Stage 0 runbook
 signing/             cosign sign/verify scripts
