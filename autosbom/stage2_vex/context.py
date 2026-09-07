@@ -11,9 +11,10 @@ an authority on its own (see review.py).
 """
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass, field
 from pathlib import Path
+
+from ..common.io_utils import load_yaml_or_json
 
 
 @dataclass
@@ -32,19 +33,10 @@ class DeviceContext:
 
     @classmethod
     def load(cls, path: str | Path) -> "DeviceContext":
-        p = Path(path)
-        text = p.read_text(encoding="utf-8")
-        if p.suffix.lower() in (".yaml", ".yml"):
-            try:
-                import yaml  # type: ignore
-            except ImportError as exc:
-                raise RuntimeError(
-                    f"{p} is YAML but PyYAML is not installed; either "
-                    f"`pip install PyYAML` or provide the context as JSON"
-                ) from exc
-            data = yaml.safe_load(text)
-        else:
-            data = json.loads(text)
+        data = load_yaml_or_json(path)
+        if data is not None and not isinstance(data, dict):
+            raise ValueError(f"{path}: device context must be a JSON/YAML "
+                             f"object, got {type(data).__name__}")
         known = {f for f in cls.__dataclass_fields__}
         return cls(**{k: v for k, v in (data or {}).items() if k in known})
 

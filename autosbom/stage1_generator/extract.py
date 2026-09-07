@@ -39,13 +39,22 @@ def extract(target: str | Path, workdir: str | Path) -> ExtractionResult:
             "the image manually and pass the extracted directory instead."
         )
 
-    subprocess.run(
-        ["binwalk", "--extract", "--directory", str(workdir), str(target)],
-        check=True,
-        capture_output=True,
-        text=True,
-        timeout=3600,
-    )
+    try:
+        subprocess.run(
+            ["binwalk", "--extract", "--directory", str(workdir), str(target)],
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=3600,
+        )
+    except subprocess.CalledProcessError as exc:
+        raise RuntimeError(
+            f"binwalk failed extracting {target} (exit {exc.returncode}): "
+            f"{(exc.stderr or '').strip()[:500]}"
+        ) from exc
+    except subprocess.TimeoutExpired as exc:
+        raise RuntimeError(f"binwalk did not finish extracting {target} "
+                           f"within 3600s") from exc
     # binwalk extracts into _<name>.extracted under the output directory
     candidates = sorted(workdir.glob("_*.extracted"))
     root = candidates[0] if candidates else workdir
